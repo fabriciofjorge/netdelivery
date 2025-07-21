@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>dotnet-Net.Delivery.Order.Notifier-27011FCC-C26D-4340-8867-D66F438159B5</UserSecretsId>
   </PropertyGroup>
 
