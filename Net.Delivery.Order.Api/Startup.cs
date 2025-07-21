@@ -7,54 +7,53 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace Net.Delivery.Order.Api
+namespace Net.Delivery.Order.Api;
+
+/// <summary>
+/// Startup class
+/// </summary>
+public class Startup
 {
+
     /// <summary>
-    /// Statup class
+    /// Configures the services to be used
     /// </summary>
-    public class Startup
+    /// <param name="services">Services collection</param>
+    public void ConfigureServices(IServiceCollection services)
     {
+        services.AddControllers();
 
-        /// <summary>
-        /// Configures the services to be used
-        /// </summary>
-        /// <param name="services">Services collection</param>
-        public void ConfigureServices(IServiceCollection services)
+        services.AddSwaggerGen(options =>
         {
-            services.AddControllers();
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Order API", Version = "v1" });
 
-            services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Order API", Version = "v1" });
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+        });
 
-                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-            });
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderService, OrderService>();
+    }
 
-            services.AddScoped<IOrderRepository, OrderRepository>();
-            services.AddScoped<IOrderService, OrderService>();
-        }
-
-        /// <summary>
-        /// Configures the services used before
-        /// </summary>
-        public void Configure(IApplicationBuilder app)
+    /// <summary>
+    /// Configures the services used before
+    /// </summary>
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseSwagger(c =>
         {
-            app.UseSwagger(c =>
-            {
-                c.SerializeAsV2 = true;
-            });
+            c.SerializeAsV2 = true;
+        });
 
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order API V1");
-            });
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order API V1");
+        });
 
-            app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
+        app.UseRouting();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

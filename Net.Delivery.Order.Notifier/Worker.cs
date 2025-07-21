@@ -8,81 +8,69 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Net.Delivery.Order.Notifier
+namespace Net.Delivery.Order.Notifier;
+
+public class Worker(ILogger<Worker> logger, IConfiguration configuration) : BackgroundService
 {
-    public class Worker : BackgroundService
+    private readonly string _orderTopicName = configuration["OrderSettings:OrderTopicName"];
+    private readonly string _kafkaBootstrapServers = configuration["OrderSettings:KafkaBootstrapServer"];
+    private readonly string _notifierConsumeGroupName = configuration["OrderSettings:NotifierConsumeGroupName"];
+
+    /// <summary>
+    /// Lopping process
+    /// </summary>
+    /// <param name="stoppingToken"></param>
+    /// <returns></returns>
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        private readonly ILogger<Worker> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly string _orderTopicName;
-        private readonly string _kafkaBootstrapServers;
-        private readonly string _notifierConsumeGroupName;
+        INotifierService notifierService = new NotifierService();
 
-        public Worker(ILogger<Worker> logger, IConfiguration configuration)
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _logger = logger;
-            _configuration = configuration;
-            _orderTopicName = _configuration["OrderSettings:OrderTopicName"];
-            _kafkaBootstrapServers = _configuration["OrderSettings:KafkaBootstrapServer"];
-            _notifierConsumeGroupName = _configuration["OrderSettings:NotifierConsumeGroupName"];
-        }
+            logger.LogInformation("Order notifier running at: {time}", DateTimeOffset.Now);
 
-        /// <summary>
-        /// Lopping process
-        /// </summary>
-        /// <param name="stoppingToken"></param>
-        /// <returns></returns>
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            INotifierService notifierService = new NotifierService();
-
-            while (!stoppingToken.IsCancellationRequested)
+            var config = new ConsumerConfig
             {
-                _logger.LogInformation("Order notifier running at: {time}", DateTimeOffset.Now);
+                BootstrapServers = _kafkaBootstrapServers,
+                GroupId = _notifierConsumeGroupName,
+                AutoOffsetReset = AutoOffsetReset.Earliest
+            };
 
-                var config = new ConsumerConfig
+            using var consumer = new ConsumerBuilder<Ignore, string>(config).Build();
+            consumer.Subscribe(_orderTopicName);
+
+            var cts = new CancellationTokenSource();
+            Console.CancelKeyPress += (_, e) => {
+                e.Cancel = true;
+                cts.Cancel();
+            };
+
+            try
+            {
+                while (true)
                 {
-                    BootstrapServers = _kafkaBootstrapServers,
-                    GroupId = _notifierConsumeGroupName,
-                    AutoOffsetReset = AutoOffsetReset.Earliest
-                };
-
-                using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
-                {
-                    consumer.Subscribe(_orderTopicName);
-
-                    CancellationTokenSource cts = new CancellationTokenSource();
-                    Console.CancelKeyPress += (_, e) => {
-                        e.Cancel = true;
-                        cts.Cancel();
-                    };
-
                     try
                     {
-                        while (true)
-                        {
-                            try
-                            {
-                                var consumeResult = consumer.Consume(cts.Token);
+                        var consumeResult = consumer.Consume(cts.Token);
 
-                                Domain.Entities.Order order = JsonSerializer.Deserialize<Domain.Entities.Order>(consumeResult.Message.Value);
+                        var order = JsonSerializer.Deserialize<Domain.Entities.Order>(consumeResult.Message.Value);
 
-                                notifierService.Notify(order);
+                        notifierService.Notify(order);
 
-                                Console.WriteLine($"Mensagem recebida: {consumeResult.Message.Value}");
-                            }
-                            catch (ConsumeException e)
-                            {
-                                Console.WriteLine($"Erro ao consumir a mensagem: {e.Error.Reason}");
-                            }
-                        }
+                        Console.WriteLine($"Mensagem recebida: {consumeResult.Message.Value}");
                     }
-                    catch (OperationCanceledException)
+                    catch (ConsumeException e)
                     {
-                        consumer.Close();
+                        Console.WriteLine($"Erro ao consumir a mensagem: {e.Error.Reason}");
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                consumer.Close();
+            }
         }
+
+        return Task.CompletedTask;
     }
 }

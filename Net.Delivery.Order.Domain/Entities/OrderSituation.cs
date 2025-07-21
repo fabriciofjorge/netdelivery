@@ -1,17 +1,16 @@
-﻿namespace Net.Delivery.Order.Domain.Entities
+﻿namespace Net.Delivery.Order.Domain.Entities;
+
+/// <summary>
+/// Possible order situations
+/// </summary>
+public enum OrderSituation
 {
     /// <summary>
-    /// Possible order situations
+    /// Order created
     /// </summary>
-    public enum OrderSituation
-    {
-        /// <summary>
-        /// Order created
-        /// </summary>
-        CREATED,
-        /// <summary>
-        /// Order delivered
-        /// </summary>
-        DELIVERED
-    }
+    CREATED,
+    /// <summary>
+    /// Order delivered
+    /// </summary>
+    DELIVERED
 }
