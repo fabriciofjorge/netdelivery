@@ -39,7 +39,7 @@ public class OrderRepository : IOrderRepository
     /// <returns>Order related to the id asked</returns>
     public Entities.Order GetOrderById(string orderId)
     {
-        Entities.Order orderRecovered = OrderDataBase.FirstOrDefault(o => o.OrderId.Equals(orderId));
+        var orderRecovered = OrderDataBase.FirstOrDefault(o => o.OrderId.Equals(orderId));
 
         if (orderRecovered == null)
             throw new Exception("Order not found");
@@ -62,7 +62,7 @@ public class OrderRepository : IOrderRepository
     /// <param name="order">Order's data</param>
     public void Update(Entities.Order order)
     {
-        Entities.Order orderRecovered = GetOrderById(order.OrderId);
+        var orderRecovered = GetOrderById(order.OrderId);
 
         orderRecovered.OrderSituation = order.OrderSituation;
     }

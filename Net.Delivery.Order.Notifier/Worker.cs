@@ -19,11 +19,11 @@ public class Worker(ILogger<Worker> logger, IConfiguration configuration) : Back
     /// <summary>
     /// Lopping process
     /// </summary>
-    /// <param name="stoppingToken"></param>
+    /// <param name="stoppingToken">Token to stop the process</param>
     /// <returns></returns>
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        INotifierService notifierService = new NotifierService();
+        var notifierService = new NotifierService();
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -40,7 +40,8 @@ public class Worker(ILogger<Worker> logger, IConfiguration configuration) : Back
             consumer.Subscribe(_orderTopicName);
 
             var cts = new CancellationTokenSource();
-            Console.CancelKeyPress += (_, e) => {
+            Console.CancelKeyPress += (_, e) =>
+            {
                 e.Cancel = true;
                 cts.Cancel();
             };
