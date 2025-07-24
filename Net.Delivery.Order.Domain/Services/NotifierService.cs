@@ -12,16 +12,12 @@ public class NotifierService : INotifierService
     /// </summary>
     /// <param name="order">Order data</param>
     public void Notify(Entities.Order order)
-    {
-        SendEmail(order.Customer.Email);
-    }
+        => SendEmail(order.Customer.Email);
 
     /// <summary>
     /// Sends email about order update to customer
     /// </summary>
     /// <param name="email">E-mail address</param>
     private void SendEmail(string email)
-    {
-        Console.WriteLine("Email sent to recipient: " + email);
-    }
+        => Console.WriteLine($"Email sent to recipient: {email}");
 }

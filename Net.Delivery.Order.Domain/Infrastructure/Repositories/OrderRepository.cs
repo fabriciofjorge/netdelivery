@@ -13,25 +13,21 @@ public class OrderRepository : IOrderRepository
     /// <summary>
     /// This is like a memory database
     /// </summary>
-    private static readonly IList<Entities.Order> OrderDataBase = new List<Entities.Order>();
+    private static readonly IList<Entities.Order> OrderDataBase = [];
 
     /// <summary>
     /// Add an order into database
     /// </summary>
     /// <param name="order">Order's data</param>
     public void Add(Entities.Order order)
-    {
-        OrderDataBase.Add(order);
-    }
+        => OrderDataBase.Add(order);
 
     /// <summary>
     /// Get all orders from database
     /// </summary>
     /// <returns>All orders</returns>
     public IList<Entities.Order> GetAll()
-    {
-        return OrderDataBase.ToList();
-    }
+        => OrderDataBase.ToList();
 
     /// <summary>
     /// Get an order from database by its id
@@ -41,10 +37,7 @@ public class OrderRepository : IOrderRepository
     {
         var orderRecovered = OrderDataBase.FirstOrDefault(o => o.OrderId.Equals(orderId));
 
-        if (orderRecovered == null)
-            throw new Exception("Order not found");
-
-        return orderRecovered;
+        return orderRecovered ?? throw new Exception("Order not found");
     }
 
     /// <summary>
@@ -52,9 +45,7 @@ public class OrderRepository : IOrderRepository
     /// </summary>
     /// <returns>All orders those have the requested situation</returns>
     public IList<Entities.Order> GetOrdersBySituation(OrderSituation orderSituation)
-    {
-        return OrderDataBase.Where(o => o.OrderSituation == orderSituation).ToList();
-    }
+        => OrderDataBase.Where(o => o.OrderSituation == orderSituation).ToList();
 
     /// <summary>
     /// Update an order to database

@@ -14,7 +14,6 @@ namespace Net.Delivery.Order.Api;
 /// </summary>
 public class Startup
 {
-
     /// <summary>
     /// Configures the services to be used
     /// </summary>

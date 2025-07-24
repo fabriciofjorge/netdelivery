@@ -5,7 +5,6 @@
 /// </summary>
 public interface INotifierService
 {
-
     /// <summary>
     /// Notifies the customer about some order update
     /// </summary>

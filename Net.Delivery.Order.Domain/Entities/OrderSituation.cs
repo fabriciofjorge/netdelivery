@@ -8,9 +8,10 @@ public enum OrderSituation
     /// <summary>
     /// Order created
     /// </summary>
-    CREATED,
+    Created,
+
     /// <summary>
     /// Order delivered
     /// </summary>
-    DELIVERED
+    Delivered
 }

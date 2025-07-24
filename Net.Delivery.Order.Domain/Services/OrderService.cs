@@ -67,9 +67,7 @@ public class OrderService : IOrderService
     /// Gets all orders to delivery
     /// </summary>
     public IList<Entities.Order> GetAllOrdersToDelivery()
-    {
-        return _orderRepository.GetOrdersBySituation(OrderSituation.CREATED);
-    }
+        => _orderRepository.GetOrdersBySituation(OrderSituation.Created);
 
     /// <summary>
     /// Publishes message with order data to Kafka topic

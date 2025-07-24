@@ -32,9 +32,7 @@ public class OrderController : ControllerBase
     /// <param name="customer">Order customer</param>
     [HttpPost("create-order")]
     public async void CreateOrder([FromForm] IList<string> items, [FromForm] Customer customer)
-    {
-        await _orderService.CreateOrder(items, customer);
-    }
+        => await _orderService.CreateOrder(items, customer);
 
     /// <summary>
     /// Updates an order situation
@@ -43,16 +41,12 @@ public class OrderController : ControllerBase
     /// <param name="orderSituation">Order situation</param>
     [HttpPut("update-order-situation")]
     public async void UpdateOrderSituation([FromForm] string orderId, [FromForm] OrderSituation orderSituation)
-    {
-        await _orderService.UpdateOrderSituation(orderId, orderSituation);
-    }
+        => await _orderService.UpdateOrderSituation(orderId, orderSituation);
 
     /// <summary>
     /// Gets all orders to delivery
     /// </summary>
     [HttpGet("get-all-orders-to-delivery")]
     public IList<Domain.Entities.Order> GetAllOrdersToDelivery()
-    {
-        return _orderService.GetAllOrdersToDelivery();
-    }
+        => _orderService.GetAllOrdersToDelivery();
 }

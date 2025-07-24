@@ -48,7 +48,7 @@ public class Order
         OrderId = Guid.NewGuid().ToString();
         OrderCreateDate = DateTime.Now;
         OrderLastUpdate = OrderCreateDate;
-        OrderSituation = OrderSituation.CREATED;
+        OrderSituation = OrderSituation.Created;
         Items = items;
         Customer = customer;
     }
